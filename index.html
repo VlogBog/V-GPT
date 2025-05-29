@@ -1,326 +1,264 @@
 <!DOCTYPE html>
 <html lang="bg">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#121212">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <title>V-GPT Чат</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        body {
-            font-family: 'Inter', sans-serif;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            background-color: #121212;
-            color: #e0e0e0;
-            overflow: hidden;
-        }
-        #chat-container {
-            width: 90%;
-            max-width: 700px;
-            height: 80vh;
-            background: #1e1e1e;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            margin: auto;
-        }
-        #chat-header {
-            padding: 20px;
-            background: #252525;
-            text-align: center;
-            border-bottom: 1px solid #333;
-            flex-shrink: 0;
-        }
-        #chat-header h1 {
-            margin: 0;
-            font-size: 2.5em;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            color: #e0e0e0;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-        }
-        #chat-box {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: #444 #1e1e1e;
-        }
-        #chat-box::-webkit-scrollbar {
-            width: 6px;
-        }
-        #chat-box::-webkit-scrollbar-track {
-            background: #1e1e1e;
-        }
-        #chat-box::-webkit-scrollbar-thumb {
-            background: #444;
-            border-radius: 3px;
-        }
-        .message {
-            margin: 10px 0;
-            padding: 12px 18px;
-            border-radius: 12px;
-            max-width: 75%;
-            line-height: 1.4;
-            animation: fadeIn 0.3s ease-in;
-            background: #2a2a2a;
-            color: #e0e0e0;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-        }
-        .user {
-            margin-left: auto;
-            background: #333;
-        }
-        .bot {
-            margin-right: auto;
-            background: #2a2a2a;
-        }
-        .image-message {
-            max-width: 50%;
-            margin: 10px 0;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-        }
-        .image-message img {
-            max-width: 100%;
-            height: auto;
-            display: block;
-            border-radius: 12px;
-        }
-        #input-container {
-            display: flex;
-            padding: 15px;
-            background: #1e1e1e;
-            border-top: 1px solid #333;
-            align-items: center;
-            flex-shrink: 0;
-            flex-wrap: wrap;
-        }
-        #user-input {
-            flex: 1;
-            padding: 12px;
-            border: 1px solid #444;
-            border-radius: 20px;
-            background: #252525;
-            color: #e0e0e0;
-            font-size: 16px;
-            outline: none;
-            transition: border-color 0.2s;
-            font-family: 'Inter', sans-serif;
-        }
-        #user-input:focus {
-            border-color: #666;
-        }
-        #mobile-input {
-            display: none;
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #444;
-            border-radius: 20px;
-            background: #252525;
-            color: #e0e0e0;
-            font-size: 14px;
-            outline: none;
-            min-height: 40px;
-            max-height: 100px;
-            line-height: 1.4;
-            resize: none;
-            overflow: hidden;
-            font-family: 'Inter', sans-serif;
-        }
-        #mobile-input:focus {
-            border-color: #666;
-        }
-        #send-btn, #clear-btn, #image-btn {
-            width: 40px;
-            height: 40px;
-            margin-left: 10px;
-            border: none;
-            background: #333;
-            color: #e0e0e0;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-        }
-        #send-btn:hover, #clear-btn:hover, #image-btn:hover {
-            background: #444;
-        }
-        #image-input {
-            display: none;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @media (max-width: 500px) {
-            #chat-container {
-                width: 100%;
-                height: 100vh;
-                border-radius: 0;
-                box-shadow: none;
-                margin: 0;
-            }
-            #chat-header h1 {
-                font-size: 1.5em;
-            }
-            #chat-box {
-                padding: 10px;
-            }
-            .message, .image-message {
-                max-width: 85%;
-            }
-            #user-input {
-                display: none;
-            }
-            #mobile-input {
-                display: block;
-            }
-            #input-container {
-                padding: 10px;
-                gap: 8px;
-            }
-            #send-btn, #clear-btn, #image-btn {
-                width: 32px;
-                height: 32px;
-                font-size: 16px;
-                margin-left: 8px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>V-GPT Чат</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      background-color: #121212;
+      color: #e0e0e0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+      padding: 10px;
+    }
+
+    #chat-container {
+      background-color: #1e1e1e;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      height: 90vh;
+      overflow: hidden;
+    }
+
+    #chat-header {
+      background-color: #252525;
+      padding: 15px;
+      text-align: center;
+      font-size: 1.8em;
+      font-weight: bold;
+      border-bottom: 1px solid #333;
+    }
+
+    #chat-box {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      scroll-behavior: smooth;
+    }
+
+    .message {
+      display: flex;
+    }
+
+    .message .bubble {
+      max-width: 70%;
+      padding: 10px 14px;
+      border-radius: 18px;
+      line-height: 1.4;
+      word-wrap: break-word;
+      display: inline-block;
+    }
+
+    .user {
+      justify-content: flex-end;
+    }
+
+    .user .bubble {
+      background-color: #333;
+      color: #fff;
+      border-bottom-right-radius: 0;
+    }
+
+    .bot {
+      justify-content: flex-start;
+    }
+
+    .bot .bubble {
+      background-color: #2a2a2a;
+      color: #e0e0e0;
+      border-bottom-left-radius: 0;
+    }
+
+    .typing-indicator {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-left: 10px;
+    }
+
+    .typing-indicator span {
+      width: 8px;
+      height: 8px;
+      background: #888;
+      border-radius: 50%;
+      animation: blink 1.4s infinite both;
+    }
+
+    .typing-indicator span:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .typing-indicator span:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes blink {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1); }
+    }
+
+    #input-container {
+      display: flex;
+      padding: 12px;
+      background: #1e1e1e;
+      border-top: 1px solid #333;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #user-input {
+      flex: 1;
+      padding: 10px 14px;
+      border: 1px solid #444;
+      border-radius: 20px;
+      background: #252525;
+      color: #e0e0e0;
+      font-size: 16px;
+      outline: none;
+    }
+
+    button {
+      width: 40px;
+      height: 40px;
+      background: #333;
+      border: none;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    button:hover {
+      background: #444;
+    }
+
+    @media (max-width: 500px) {
+      #chat-container {
+        height: 100vh;
+        border-radius: 0;
+      }
+
+      #chat-header {
+        font-size: 1.4em;
+        padding: 10px;
+      }
+
+      #user-input {
+        font-size: 14px;
+      }
+
+      button {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div id="chat-container">
-        <div id="chat-header">
-            <h1>V-GPT</h1>
-        </div>
-        <div id="chat-box"></div>
-        <div id="input-container">
-            <input type="text" id="user-input" placeholder="Задайте въпрос...">
-            <textarea id="mobile-input" placeholder="Задайте въпрос..."></textarea>
-            <input type="file" id="image-input" accept="image/*">
-            <button id="image-btn"><i class="fa-solid fa-image"></i></button>
-            <button id="send-btn"><i class="fa-solid fa-paper-plane"></i></button>
-            <button id="clear-btn"><i class="fa-solid fa-trash"></i></button>
-        </div>
+  <div id="chat-container">
+    <div id="chat-header">V-GPT</div>
+    <div id="chat-box"></div>
+    <div id="input-container">
+      <input type="text" id="user-input" placeholder="Задайте въпрос..." />
+      <button id="send-btn"><i class="fas fa-paper-plane"></i></button>
     </div>
+  </div>
 
-    <script>
-        const responses = {
-            "здравей": "Здравей! Аз съм V-GPT, твоят виртуален асистент. Как мога да ти помогна днес?",
-            "как си": "Супер съм, благодаря! А ти как си?",
-            "какво можеш да правиш": "Мога да отговарям на прости въпроси с предварително зададени отговори. Задай ми нещо!",
-            "кой те създаде": "Аз съм V-GPT, създаден с HTML, CSS и JavaScript, за да бъда твой чат приятел!",
-            "как е времето": "Нямам данни за времето, но предполагам, че е идеално за чат! 😄",
-            "напиши ми кратка история": "Имало едно време момиче на име Емили, което обичало да се разхожда в гората. Край!",
-            "чао": "Чао, ако имаш още въпроси, знаеш къде съм!",
-            "моите въпроси": "1. здравей, 2. как си, 3. какво можеш да правиш, 4. кой те създаде, 5. как е времето, 6. напиши ми кратка история, 7. чао"
-        };
+  <script>
+    const responses = {
+      "здравей": "Здравей! Аз съм V-GPT. Как мога да ти помогна?",
+      "как си": "Добре съм, благодаря! А ти?",
+      "чао": "Довиждане! До скоро!",
+      "история": "Имало едно време един потребител, който си направи свой чат бот. Край!"
+    };
 
-        const chatBox = document.getElementById('chat-box');
-        const userInput = document.getElementById('user-input');
-        const mobileInput = document.getElementById('mobile-input');
-        const sendBtn = document.getElementById('send-btn');
-        const clearBtn = document.getElementById('clear-btn');
-        const imageInput = document.getElementById('image-input');
-        const imageBtn = document.getElementById('image-btn');
+    const chatBox = document.getElementById('chat-box');
+    const userInput = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
 
-        function addMessage(text, sender) {
-            const message = document.createElement('div');
-            message.classList.add('message', sender);
-            message.textContent = text;
-            chatBox.appendChild(message);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
+    function addMessage(text, sender) {
+      const message = document.createElement('div');
+      message.className = 'message ' + sender;
 
-        function addImageMessage(file, sender) {
-            const message = document.createElement('div');
-            message.classList.add('image-message', sender);
-            const img = document.createElement('img');
-            img.src = URL.createObjectURL(file);
-            img.onload = () => URL.revokeObjectURL(img.src);
-            message.appendChild(img);
-            chatBox.appendChild(message);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.textContent = text;
 
-        function getResponse(input) {
-            const cleanInput = input.trim().toLowerCase();
-            for (let question in responses) {
-                if (cleanInput.includes(question.toLowerCase())) {
-                    return responses[question];
-                }
-            }
-            return "Съжалявам, не разпознах въпроса. Опитай нещо като 'здравей', 'как си' или 'моите въпроси'!";
-        }
+      message.appendChild(bubble);
+      chatBox.appendChild(message);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
 
-        function handleInput() {
-            const input = window.innerWidth <= 400 ? mobileInput.value.trim() : userInput.value.trim();
-            if (input) {
-                addMessage(input, 'user');
-                const response = getResponse(input);
-                setTimeout(() => addMessage(response, 'bot'), 500);
-                if (window.innerWidth <= 400) {
-                    mobileInput.value = '';
-                    mobileInput.style.height = '40px';
-                } else {
-                    userInput.value = '';
-                }
-            }
-        }
+    function showTypingIndicator() {
+      const typing = document.createElement('div');
+      typing.className = 'message bot';
+      typing.id = 'typing';
 
-        mobileInput.addEventListener('input', () => {
-            mobileInput.style.height = '40px';
-            mobileInput.style.height = `${mobileInput.scrollHeight}px`;
-        });
+      const indicator = document.createElement('div');
+      indicator.className = 'bubble typing-indicator';
+      indicator.innerHTML = '<span></span><span></span><span></span>';
 
-        sendBtn.addEventListener('click', handleInput);
+      typing.appendChild(indicator);
+      chatBox.appendChild(typing);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
 
-        userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') handleInput();
-        });
+    function removeTypingIndicator() {
+      const typing = document.getElementById('typing');
+      if (typing) typing.remove();
+    }
 
-        mobileInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                handleInput();
-            }
-        });
+    function getResponse(input) {
+      input = input.toLowerCase().trim();
+      for (let key in responses) {
+        if (input.includes(key)) return responses[key];
+      }
+      return "Не разбрах въпроса. Опитай с 'здравей' или 'история'.";
+    }
 
-        clearBtn.addEventListener('click', () => {
-            chatBox.innerHTML = '';
-            mobileInput.value = '';
-            mobileInput.style.height = '40px';
-        });
+    function handleSend() {
+      const input = userInput.value.trim();
+      if (!input) return;
 
-        imageBtn.addEventListener('click', () => {
-            imageInput.click();
-        });
+      addMessage(input, 'user');
+      userInput.value = '';
 
-        imageInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                addImageMessage(file, 'user');
-                setTimeout(() => addMessage("Изглежда страхотно! Но аз мога да отговарям само на текстови въпроси. 😄", 'bot'), 500);
-                imageInput.value = '';
-            }
-        });
-    </script>
+      showTypingIndicator();
+
+      setTimeout(() => {
+        removeTypingIndicator();
+        const reply = getResponse(input);
+        addMessage(reply, 'bot');
+      }, 1000);
+    }
+
+    sendBtn.addEventListener('click', handleSend);
+    userInput.addEventListener('keypress', e => {
+      if (e.key === 'Enter') handleSend();
+    });
+  </script>
 </body>
 </html>
