@@ -12,47 +12,39 @@
       padding: 0;
     }
 
-    body {
+    html, body {
+      height: 100%;
       font-family: 'Segoe UI', Roboto, sans-serif;
       background-color: #121212;
       color: #e0e0e0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      overflow: hidden;
-      padding: 10px;
     }
 
     #chat-container {
-      background-color: #1e1e1e;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-      width: 100%;
-      max-width: 600px;
       display: flex;
       flex-direction: column;
-      height: 90vh;
-      overflow: hidden;
+      height: 100vh;
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #1e1e1e;
     }
 
     #chat-header {
       background-color: #252525;
       padding: 15px;
       text-align: center;
-      font-size: 1.8em;
+      font-size: 1.6em;
       font-weight: bold;
       border-bottom: 1px solid #333;
     }
 
     #chat-box {
       flex: 1;
-      padding: 15px;
       overflow-y: auto;
+      padding: 15px;
       display: flex;
       flex-direction: column;
       gap: 10px;
-      scroll-behavior: smooth;
     }
 
     .message {
@@ -60,12 +52,11 @@
     }
 
     .message .bubble {
-      max-width: 70%;
+      max-width: 75%;
       padding: 10px 14px;
       border-radius: 18px;
       line-height: 1.4;
       word-wrap: break-word;
-      display: inline-block;
     }
 
     .user {
@@ -118,10 +109,10 @@
 
     #input-container {
       display: flex;
-      padding: 12px;
+      align-items: center;
+      padding: 10px;
       background: #1e1e1e;
       border-top: 1px solid #333;
-      align-items: center;
       gap: 8px;
     }
 
@@ -136,40 +127,39 @@
       outline: none;
     }
 
-    button {
-      width: 40px;
-      height: 40px;
+    .icon-button {
       background: #333;
       border: none;
       border-radius: 50%;
       color: #fff;
+      width: 40px;
+      height: 40px;
       font-size: 18px;
-      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
+      cursor: pointer;
     }
 
-    button:hover {
+    .icon-button:hover {
       background: #444;
     }
 
-    @media (max-width: 500px) {
-      #chat-container {
-        height: 100vh;
-        border-radius: 0;
-      }
+    input[type="file"] {
+      display: none;
+    }
 
-      #chat-header {
-        font-size: 1.4em;
-        padding: 10px;
+    @media (max-width: 600px) {
+      #chat-container {
+        height: 100dvh;
+        max-width: 100%;
       }
 
       #user-input {
         font-size: 14px;
       }
 
-      button {
+      .icon-button {
         width: 36px;
         height: 36px;
         font-size: 16px;
@@ -181,9 +171,21 @@
   <div id="chat-container">
     <div id="chat-header">V-GPT</div>
     <div id="chat-box"></div>
+
     <div id="input-container">
-      <input type="text" id="user-input" placeholder="Задайте въпрос..." />
-      <button id="send-btn"><i class="fas fa-paper-plane"></i></button>
+      <input type="file" id="image-upload" accept="image/*" onchange="handleImageUpload(event)" />
+      <button class="icon-button" onclick="document.getElementById('image-upload').click()" title="Качи снимка">
+        <i class="fas fa-paperclip"></i>
+      </button>
+
+      <button class="icon-button" onclick="clearChat()" title="Изчисти чата">
+        <i class="fas fa-trash-alt"></i>
+      </button>
+
+      <input type="text" id="user-input" placeholder="Задай въпрос..." />
+      <button class="icon-button" id="send-btn" title="Изпрати">
+        <i class="fas fa-paper-plane"></i>
+      </button>
     </div>
   </div>
 
@@ -191,8 +193,12 @@
     const responses = {
       "здравей": "Здравей! Аз съм V-GPT. Как мога да ти помогна?",
       "как си": "Добре съм, благодаря! А ти?",
-      "чао": "Довиждане! До скоро!",
-      "история": "Имало едно време един потребител, който си направи свой чат бот. Край!"
+      "добре съм": "Радвам се че си добре!",
+      "какво правиш": "Пиша си с теб, а ти какво правиш?",
+      "правя секс с приятелката ми": "Красива ли е?",
+      "да": "Приятен секс тогава!",
+      "напиши история": "Имало едно време един момиче на име Емили, която много обичала да се разхожда чисто гола и потна в гората. Край!",
+      "чао": "Чао, ако имаш въпроси знаеш къде да ме намериш!
     };
 
     const chatBox = document.getElementById('chat-box');
@@ -236,7 +242,7 @@
       for (let key in responses) {
         if (input.includes(key)) return responses[key];
       }
-      return "Не разбрах въпроса. Опитай с 'здравей' или 'история'.";
+      return "Не разбрах въпроса. Опитай с 'здравей' или 'помощ'.";
     }
 
     function handleSend() {
@@ -253,6 +259,20 @@
         const reply = getResponse(input);
         addMessage(reply, 'bot');
       }, 1000);
+    }
+
+    function clearChat() {
+      chatBox.innerHTML = '';
+    }
+
+    function handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        addMessage("📎 Изпрати снимка: " + file.name, 'user');
+        setTimeout(() => {
+          addMessage("Извинявай, засега не мога да анализирам изображения.", 'bot');
+        }, 1000);
+      }
     }
 
     sendBtn.addEventListener('click', handleSend);
