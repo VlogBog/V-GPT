@@ -2,208 +2,85 @@
 <html lang="bg">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>V-GPT Чат</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>V-GPT Чат с AI</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html, body {
-      height: 100%;
-      font-family: 'Segoe UI', Roboto, sans-serif;
+    body {
       background-color: #121212;
       color: #e0e0e0;
-    }
-
-    #chat-container {
+      font-family: 'Inter', sans-serif;
       display: flex;
       flex-direction: column;
+      align-items: center;
+      justify-content: center;
       height: 100vh;
-      width: 100%;
-      max-width: 600px;
-      margin: 0 auto;
-      background-color: #1e1e1e;
+      margin: 0;
     }
-
-    #chat-header {
-      background-color: #252525;
-      padding: 15px;
-      text-align: center;
-      font-size: 1.6em;
-      font-weight: bold;
-      border-bottom: 1px solid #333;
-    }
-
     #chat-box {
-      flex: 1;
+      width: 90%;
+      max-width: 700px;
+      height: 70vh;
       overflow-y: auto;
-      padding: 15px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    #chat-box::-webkit-scrollbar{
-        display: none;
-    }
-
-    .message {
-      display: flex;
-    }
-
-    .message .bubble {
-      max-width: 75%;
-      padding: 10px 14px;
-      border-radius: 18px;
-      line-height: 1.4;
-      word-wrap: break-word;
-    }
-
-    .user {
-      justify-content: flex-end;
-    }
-
-    .user .bubble {
-      background-color: #333;
-      color: #fff;
-      border-bottom-right-radius: 0;
-    }
-
-    .bot {
-      justify-content: flex-start;
-    }
-
-    .bot .bubble {
-      background-color: #2a2a2a;
-      color: #e0e0e0;
-      border-bottom-left-radius: 0;
-    }
-
-    .typing-indicator {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      margin-left: 10px;
-    }
-
-    .typing-indicator span {
-      width: 8px;
-      height: 8px;
-      background: #888;
-      border-radius: 50%;
-      animation: blink 1.4s infinite both;
-    }
-
-    .typing-indicator span:nth-child(2) {
-      animation-delay: 0.2s;
-    }
-
-    .typing-indicator span:nth-child(3) {
-      animation-delay: 0.4s;
-    }
-
-    @keyframes blink {
-      0%, 80%, 100% { transform: scale(0); }
-      40% { transform: scale(1); }
-    }
-
-    #input-container {
-      display: flex;
-      align-items: center;
-      padding: 10px;
       background: #1e1e1e;
-      border-top: 1px solid #333;
-      gap: 8px;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.6);
     }
-
+    .message {
+      margin: 10px 0;
+      padding: 12px 18px;
+      border-radius: 12px;
+      background: #2a2a2a;
+      max-width: 75%;
+    }
+    .user {
+      background: #333;
+      margin-left: auto;
+    }
+    .bot {
+      margin-right: auto;
+    }
+    #input-container {
+      margin-top: 20px;
+      display: flex;
+      width: 90%;
+      max-width: 700px;
+    }
     #user-input {
       flex: 1;
-      padding: 10px 14px;
-      border: 1px solid #444;
+      padding: 12px;
       border-radius: 20px;
+      border: 1px solid #444;
       background: #252525;
       color: #e0e0e0;
       font-size: 16px;
       outline: none;
     }
-
-    .icon-button {
-      background: #333;
+    #send-btn {
+      margin-left: 10px;
+      padding: 12px 20px;
+      border-radius: 20px;
       border: none;
-      border-radius: 50%;
-      color: #fff;
-      width: 40px;
-      height: 40px;
-      font-size: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background: #333;
+      color: #e0e0e0;
       cursor: pointer;
     }
-
-    .icon-button:hover {
+    #send-btn:hover {
       background: #444;
-    }
-
-    input[type="file"] {
-      display: none;
-    }
-
-    @media (max-width: 600px) {
-      #chat-container {
-        height: 100dvh;
-        max-width: 100%;
-      }
-
-      #user-input {
-        font-size: 14px;
-      }
-
-      .icon-button {
-        width: 36px;
-        height: 36px;
-        font-size: 16px;
-      }
     }
   </style>
 </head>
 <body>
-  <div id="chat-container">
-    <div id="chat-header">V-GPT</div>
-    <div id="chat-box"></div>
 
-    <div id="input-container">
-      <input type="file" id="image-upload" accept="image/*" onchange="handleImageUpload(event)" />
-      <button class="icon-button" onclick="document.getElementById('image-upload').click()" title="Качи снимка">
-        <i class="fas fa-paperclip"></i>
-      </button>
+  <div id="chat-box"></div>
 
-      <button class="icon-button" onclick="clearChat()" title="Изчисти чата">
-        <i class="fas fa-trash-alt"></i>
-      </button>
-
-      <input type="text" id="user-input" placeholder="Задай въпрос..." />
-      <button class="icon-button" id="send-btn" title="Изпрати">
-        <i class="fas fa-paper-plane"></i>
-      </button>
-    </div>
+  <div id="input-container">
+    <input type="text" id="user-input" placeholder="Задай въпрос към ИИ..." />
+    <button id="send-btn">Изпрати</button>
   </div>
 
   <script>
-    const responses = {
-      "здравей": "Здравей! Аз съм V-GPT. Как мога да ти помогна?",
-      "как си": "Добре съм, благодаря! А ти?",
-      "добре съм": "Радвам се че си добре!",
-      "какво правиш": "Пиша си с теб, а ти какво правиш?",
-      "правя секс с приятелката ми": "Красива ли е?",
-      "да": "Приятен секс тогава!",
-      "напиши история": "Имало едно време едно момиче на име Емили, която много обичала да се разхожда чисто гола и потна в гората. Край!",
-      "чао": "Чао, ако имаш въпроси знаеш къде да ме намериш!",
-    };
+    const API_KEY = "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";
 
     const chatBox = document.getElementById('chat-box');
     const userInput = document.getElementById('user-input');
@@ -211,78 +88,50 @@
 
     function addMessage(text, sender) {
       const message = document.createElement('div');
-      message.className = 'message ' + sender;
-
-      const bubble = document.createElement('div');
-      bubble.className = 'bubble';
-      bubble.textContent = text;
-
-      message.appendChild(bubble);
+      message.classList.add('message', sender);
+      message.textContent = text;
       chatBox.appendChild(message);
       chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    function showTypingIndicator() {
-      const typing = document.createElement('div');
-      typing.className = 'message bot';
-      typing.id = 'typing';
+    async function getAIResponse(message) {
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + API_KEY
+        },
+        body: JSON.stringify({
+          model: "mistral/mixtral-8x7B-instruct",
+          messages: [
+            { role: "user", content: message }
+          ]
+        })
+      });
 
-      const indicator = document.createElement('div');
-      indicator.className = 'bubble typing-indicator';
-      indicator.innerHTML = '<span></span><span></span><span></span>';
-
-      typing.appendChild(indicator);
-      chatBox.appendChild(typing);
-      chatBox.scrollTop = chatBox.scrollHeight;
+      const data = await res.json();
+      return data.choices?.[0]?.message?.content || "Грешка при отговора.";
     }
 
-    function removeTypingIndicator() {
-      const typing = document.getElementById('typing');
-      if (typing) typing.remove();
-    }
-
-    function getResponse(input) {
-      input = input.toLowerCase().trim();
-      for (let key in responses) {
-        if (input.includes(key)) return responses[key];
-      }
-      return "Не разбрах въпроса. Опитай пак!";
-    }
-
-    function handleSend() {
+    sendBtn.addEventListener('click', async () => {
       const input = userInput.value.trim();
       if (!input) return;
 
       addMessage(input, 'user');
       userInput.value = '';
+      addMessage("...Мисля...", 'bot');
 
-      showTypingIndicator();
+      const botMessages = document.querySelectorAll('.bot');
+      const thinkingMsg = botMessages[botMessages.length - 1];
 
-      setTimeout(() => {
-        removeTypingIndicator();
-        const reply = getResponse(input);
-        addMessage(reply, 'bot');
-      }, 1000);
-    }
-
-    function clearChat() {
-      chatBox.innerHTML = '';
-    }
-
-    function handleImageUpload(event) {
-      const file = event.target.files[0];
-      if (file) {
-        addMessage("📎 Изпрати снимка: " + file.name, 'user');
-        setTimeout(() => {
-          addMessage("Извинявай, засега не мога да анализирам изображения.", 'bot');
-        }, 1000);
+      try {
+        const aiResponse = await getAIResponse(input);
+        thinkingMsg.textContent = aiResponse;
+      } catch (err) {
+        thinkingMsg.textContent = "Възникна грешка при свързването с AI.";
       }
-    }
-
-    sendBtn.addEventListener('click', handleSend);
-    userInput.addEventListener('keypress', e => {
-      if (e.key === 'Enter') handleSend();
     });
   </script>
+
 </body>
 </html>
